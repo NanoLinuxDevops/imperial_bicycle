@@ -7,12 +7,12 @@ function convertToCSV(data, headers) {
         return headers.map(header => {
             const value = row[header] || '';
             // Escape quotes and wrap in quotes if contains comma
-            return typeof value === 'string' && (value.includes(',') || value.includes('"')) 
-                ? `"${value.replace(/"/g, '""')}"` 
+            return typeof value === 'string' && (value.includes(',') || value.includes('"'))
+                ? `"${value.replace(/"/g, '""')}"`
                 : value;
         }).join(',');
     });
-    
+
     return [csvHeaders, ...csvRows].join('\n');
 }
 
@@ -20,14 +20,14 @@ function convertToCSV(data, headers) {
 function saveCSVToLocal(filename, csvContent) {
     // Create a blob with CSV content
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    
+
     // Create download link
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     link.setAttribute('download', filename);
     link.style.visibility = 'hidden';
-    
+
     // Trigger download
     document.body.appendChild(link);
     link.click();
@@ -53,7 +53,7 @@ function exportBicyclesCSV() {
             customerPhone: customer ? customer.phoneNumber : 'N/A'
         };
     });
-    
+
     const headers = ['id', 'customerName', 'customerPhone', 'brand', 'model', 'color', 'type', 'additionalSpecs', 'totalRepairs', 'registeredAt', 'lastServiceDate'];
     const csvContent = convertToCSV(bicyclesWithCustomer, headers);
     const filename = `bicycles_${new Date().toISOString().split('T')[0]}.csv`;
@@ -67,7 +67,7 @@ function exportJobOffersCSV() {
         const customer = db.customers.find(c => c.id === job.customerId);
         const bicycle = db.bicycles.find(b => b.id === job.bicycleId);
         const repairsList = job.repairs.map(r => `${r.description} (₪${r.price})`).join('; ');
-        
+
         return {
             id: job.id,
             customerName: customer ? customer.name : 'Unknown',
@@ -82,7 +82,7 @@ function exportJobOffersCSV() {
             completedAt: job.completedAt || ''
         };
     });
-    
+
     const headers = ['id', 'customerName', 'customerPhone', 'bicycleBrand', 'bicycleColor', 'repairs', 'totalAmount', 'status', 'notes', 'createdAt', 'completedAt'];
     const csvContent = convertToCSV(jobOffersWithDetails, headers);
     const filename = `job_offers_${new Date().toISOString().split('T')[0]}.csv`;
@@ -96,7 +96,7 @@ function exportRepairHistoryCSV() {
         const customer = db.customers.find(c => c.id === repair.customerId);
         const bicycle = db.bicycles.find(b => b.id === repair.bicycleId);
         const repairsList = repair.repairs.map(r => `${r.description} (₪${r.price})`).join('; ');
-        
+
         return {
             id: repair.id,
             customerName: customer ? customer.name : 'Unknown',
@@ -109,7 +109,7 @@ function exportRepairHistoryCSV() {
             completedAt: repair.completedAt
         };
     });
-    
+
     const headers = ['id', 'customerName', 'customerPhone', 'bicycleBrand', 'bicycleColor', 'repairs', 'totalAmount', 'notes', 'completedAt'];
     const csvContent = convertToCSV(repairHistoryWithDetails, headers);
     const filename = `repair_history_${new Date().toISOString().split('T')[0]}.csv`;
@@ -123,7 +123,7 @@ function exportAllToCSV() {
     setTimeout(() => exportBicyclesCSV(), 500);
     setTimeout(() => exportJobOffersCSV(), 1000);
     setTimeout(() => exportRepairHistoryCSV(), 1500);
-    
+
     showNotification('All data exported to CSV files!', 'success');
 }
 
@@ -132,7 +132,7 @@ function autoSaveToCSV() {
     // Save customers
     const customersCSV = convertToCSV(db.customers, ['id', 'name', 'phoneNumber', 'email', 'address', 'totalVisits', 'totalSpent', 'createdAt']);
     localStorage.setItem('csv_customers', customersCSV);
-    
+
     // Save bicycles
     const bicyclesWithCustomer = db.bicycles.map(bike => {
         const customer = db.customers.find(c => c.id === bike.customerId);
@@ -144,13 +144,13 @@ function autoSaveToCSV() {
     });
     const bicyclesCSV = convertToCSV(bicyclesWithCustomer, ['id', 'customerName', 'customerPhone', 'brand', 'model', 'color', 'type', 'additionalSpecs', 'totalRepairs', 'registeredAt', 'lastServiceDate']);
     localStorage.setItem('csv_bicycles', bicyclesCSV);
-    
+
     // Save job offers
     const jobOffersWithDetails = db.jobOffers.map(job => {
         const customer = db.customers.find(c => c.id === job.customerId);
         const bicycle = db.bicycles.find(b => b.id === job.bicycleId);
         const repairsList = job.repairs.map(r => `${r.description} (₪${r.price})`).join('; ');
-        
+
         return {
             id: job.id,
             customerName: customer ? customer.name : 'Unknown',
@@ -167,7 +167,7 @@ function autoSaveToCSV() {
     });
     const jobOffersCSV = convertToCSV(jobOffersWithDetails, ['id', 'customerName', 'customerPhone', 'bicycleBrand', 'bicycleColor', 'repairs', 'totalAmount', 'status', 'notes', 'createdAt', 'completedAt']);
     localStorage.setItem('csv_job_offers', jobOffersCSV);
-    
+
     console.log('Data auto-saved to CSV format in localStorage');
 }
 
@@ -176,19 +176,19 @@ function showNotification(message, type = 'success') {
     // Remove existing notifications
     const existingNotifications = document.querySelectorAll('.notification');
     existingNotifications.forEach(notification => notification.remove());
-    
+
     // Create new notification
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
-    
+
     document.body.appendChild(notification);
-    
+
     // Show notification
     setTimeout(() => {
         notification.classList.add('show');
     }, 100);
-    
+
     // Hide notification after 3 seconds
     setTimeout(() => {
         notification.classList.remove('show');
