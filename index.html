@@ -212,26 +212,51 @@
                     <h3>DATA STORAGE LOCATION</h3>
                     <div class="storage-details">
                         <div class="storage-item">
-                            <span class="storage-icon">DB</span>
+                            <span class="storage-icon">🔥</span>
                             <div class="storage-text">
-                                <strong>Local Browser Storage</strong>
-                                <p>All data is saved locally in your browser's localStorage</p>
+                                <strong>Firebase Cloud Database</strong>
+                                <p>Data is securely stored in Google Firebase Firestore</p>
                             </div>
                         </div>
                         <div class="storage-item">
-                            <span class="storage-icon">SEC</span>
+                            <span class="storage-icon">☁️</span>
                             <div class="storage-text">
-                                <strong>Private & Secure</strong>
-                                <p>Data stays on your computer only - no cloud storage</p>
+                                <strong>Cloud Synchronized</strong>
+                                <p>Access your data from any device, anywhere</p>
                             </div>
                         </div>
                         <div class="storage-item">
-                            <span class="storage-icon">CAT</span>
+                            <span class="storage-icon">🔒</span>
+                            <div class="storage-text">
+                                <strong>Secure & Backed Up</strong>
+                                <p>Enterprise-grade security with automatic backups</p>
+                            </div>
+                        </div>
+                        <div class="storage-item">
+                            <span class="storage-icon">📊</span>
                             <div class="storage-text">
                                 <strong>4 Data Categories</strong>
                                 <p>Customers, Bicycles, Job Offers, Repair History</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Firebase Migration Section -->
+                <div class="migration-section" id="migrationSection" style="display: none;">
+                    <h3>🔄 MIGRATE FROM LOCAL STORAGE</h3>
+                    <div class="migration-info">
+                        <p>We detected data in your browser's local storage. Would you like to migrate it to Firebase?
+                        </p>
+                        <div class="migration-actions">
+                            <button onclick="startMigration()" class="migrate-btn">
+                                🚀 MIGRATE TO FIREBASE
+                            </button>
+                            <button onclick="downloadLocalBackup()" class="backup-btn">
+                                💾 BACKUP LOCAL DATA
+                            </button>
+                        </div>
+                        <div id="migrationStatus" class="migration-status"></div>
                     </div>
                 </div>
 
@@ -290,9 +315,93 @@
         </main>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Make Firebase available globally
+        window.Firebase = { initializeApp, getFirestore, getAuth };
+    </script>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="firebase-database.js"></script>
+    <script type="module" src="firebase-migration.js"></script>
     <script src="script.js"></script>
     <script src="data-export.js"></script>
     <script src="local-database.js"></script>
+
+    <!-- Firebase Integration Script -->
+    <script type="module">
+        import FirebaseMigration from './firebase-migration.js';
+
+        // Make Firebase functions available globally
+        window.firebaseMigration = new FirebaseMigration();
+
+        // Check for local data and show migration section
+        document.addEventListener('DOMContentLoaded', function () {
+            checkForLocalData();
+            showFirebaseStatus();
+        });
+
+        // Check if local data exists
+        function checkForLocalData() {
+            if (window.firebaseMigration.hasLocalData()) {
+                document.getElementById('migrationSection').style.display = 'block';
+            }
+        }
+
+        // Show Firebase connection status
+        function showFirebaseStatus() {
+            // This will be implemented based on your Firebase config
+            console.log('Firebase integration ready');
+        }
+
+        // Global migration functions
+        window.startMigration = async function () {
+            const statusDiv = document.getElementById('migrationStatus');
+            statusDiv.innerHTML = '<div class="firebase-loading">Migrating data to Firebase...</div>';
+            statusDiv.className = 'migration-status loading';
+
+            try {
+                const result = await window.firebaseMigration.performFullMigration();
+
+                if (result.success) {
+                    statusDiv.innerHTML = `
+                        <div>
+                            <strong>✅ Migration Successful!</strong><br>
+                            ${result.migratedData ?
+                            `Migrated: ${result.migratedData.customers} customers, ${result.migratedData.bicycles} bicycles, ${result.migratedData.jobOffers} job offers, ${result.migratedData.repairHistory} repair records`
+                            : result.message}
+                        </div>
+                    `;
+                    statusDiv.className = 'migration-status success';
+
+                    // Hide migration section after successful migration
+                    setTimeout(() => {
+                        document.getElementById('migrationSection').style.display = 'none';
+                    }, 5000);
+                } else {
+                    statusDiv.innerHTML = `<strong>❌ Migration Failed:</strong><br>${result.message}`;
+                    statusDiv.className = 'migration-status error';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<strong>❌ Migration Error:</strong><br>${error.message}`;
+                statusDiv.className = 'migration-status error';
+            }
+        };
+
+        window.downloadLocalBackup = function () {
+            try {
+                window.firebaseMigration.backupLocalData();
+                showNotification('Local data backup downloaded successfully!', 'success');
+            } catch (error) {
+                showNotification('Failed to create backup: ' + error.message, 'error');
+            }
+        };
+    </script>
 </body>
 
 </html>

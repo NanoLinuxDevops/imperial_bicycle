@@ -556,7 +556,7 @@ function backToBicycleList() {
     }
 }
 
-// Create job offer - WORKING
+// Create job offer - IMPROVED FORM
 function createJobOffer(bicycleId) {
     console.log('Creating job offer for bicycle:', bicycleId);
     try {
@@ -567,57 +567,97 @@ function createJobOffer(bicycleId) {
         const jobsContent = document.getElementById('jobsContent');
 
         jobsContent.innerHTML = `
-            <div class="job-form">
-                <button type="button" onclick="backToBicycleList()" class="back-btn" style="margin-bottom: 20px;">
-                    ← BACK TO BICYCLE LIST
-                </button>
-                
-                <h3>Job Offer for ${bicycle.brand} - ${customer ? customer.name : 'Unknown Customer'}</h3>
-                <div class="bicycle-info">
-                    <div class="info-item">
-                        <span class="info-label">Phone:</span>
-                        <span>${customer ? customer.phoneNumber : 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Registered:</span>
-                        <span>${new Date(bicycle.registeredAt).toLocaleDateString()}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Bike:</span>
-                        <span>${bicycle.brand} (${bicycle.color})</span>
-                    </div>
-                </div>
-                
-                <div class="repairs-header">
-                    <h4>Repairs & Services</h4>
-                    <button type="button" onclick="showRepairServicesManager()" class="back-btn" style="margin-left: auto; margin-bottom: 0;">
-                        MANAGE SERVICES
+            <div class="job-offer-container">
+                <div class="job-offer-header">
+                    <button type="button" onclick="backToBicycleList()" class="back-btn">
+                        ← BACK TO BICYCLE LIST
                     </button>
+                    
+                    <div class="customer-bike-info">
+                        <h2>🔧 Create Job Offer</h2>
+                        <div class="info-card">
+                            <div class="customer-details">
+                                <h3>👤 ${customer ? customer.name : 'Unknown Customer'}</h3>
+                                <div class="detail-row">
+                                    <span class="detail-label">📞 Phone:</span>
+                                    <span class="detail-value">${customer ? customer.phoneNumber : 'N/A'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">📧 Email:</span>
+                                    <span class="detail-value">${customer && customer.email ? customer.email : 'Not provided'}</span>
+                                </div>
+                            </div>
+                            <div class="bicycle-details">
+                                <h3>🚲 ${bicycle.brand}</h3>
+                                <div class="detail-row">
+                                    <span class="detail-label">🎨 Color:</span>
+                                    <span class="detail-value">${bicycle.color}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">🏷️ Type:</span>
+                                    <span class="detail-value">${bicycle.type}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">📅 Registered:</span>
+                                    <span class="detail-value">${new Date(bicycle.registeredAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <form id="jobOfferForm" onsubmit="saveJobOffer(event, ${bicycleId})">
-                    <div id="repairItems">
-                        ${generateRepairServicesList()}
-                    </div>
-                    
-                    <div class="repair-actions">
-                        <button type="button" onclick="addTemporaryRepair()">+ Add Temporary Repair</button>
-                        <button type="button" onclick="showAddPermanentServiceForm()">+ Add Permanent Service</button>
-                        <button type="button" onclick="showAllRepairs()" style="background-color: #17a2b8; color: white;">↻ Show All Repairs</button>
-                    </div>
-                    
-                    <div class="total-section">
-                        <div class="total-amount">
-                            Total: ₪<span id="totalAmount">0.00</span>
+                <form id="jobOfferForm" onsubmit="saveJobOffer(event, ${bicycleId})" class="job-offer-form">
+                    <div class="repairs-section">
+                        <div class="section-header">
+                            <h3>🛠️ Select Repairs & Services</h3>
+                            <div class="section-actions">
+                                <button type="button" onclick="selectAllRepairs()" class="action-btn select-all">
+                                    ✅ Select All
+                                </button>
+                                <button type="button" onclick="clearAllRepairs()" class="action-btn clear-all">
+                                    ❌ Clear All
+                                </button>
+                                <button type="button" onclick="showRepairServicesManager()" class="action-btn manage-services">
+                                    ⚙️ Manage Services
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="repairItems" class="repair-services-grid">
+                            ${generateImprovedRepairServicesList()}
+                        </div>
+                        
+                        <div class="custom-repair-section">
+                            <button type="button" onclick="addTemporaryRepair()" class="add-repair-btn">
+                                ➕ Add Custom Repair
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="jobNotes">Additional Notes:</label>
-                        <textarea id="jobNotes" rows="3" placeholder="Any additional notes or special instructions..."></textarea>
+                    <div class="pricing-summary">
+                        <div class="total-section">
+                            <div class="total-display">
+                                <span class="total-label">💰 Total Amount:</span>
+                                <span class="total-amount">₪<span id="totalAmount">0.00</span></span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <button type="submit">Create Job Offer</button>
+                    <div class="notes-section">
+                        <div class="form-group">
+                            <label for="jobNotes">📝 Additional Notes & Instructions:</label>
+                            <textarea id="jobNotes" rows="4" placeholder="Enter any special instructions, customer requests, or additional notes about the repair..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" onclick="backToBicycleList()" class="cancel-btn">
+                            ❌ Cancel
+                        </button>
+                        <button type="submit" class="submit-btn">
+                            🎫 Create Job Offer
+                        </button>
+                    </div>
                 </form>
             </div>
         `;
@@ -684,7 +724,7 @@ function calculateTotal() {
     }
 }
 
-// Save job offer - WORKING
+// Save job offer - UPDATED FOR NEW FORM
 function saveJobOffer(event, bicycleId) {
     console.log('Saving job offer');
     event.preventDefault();
@@ -695,28 +735,51 @@ function saveJobOffer(event, bicycleId) {
 
         const repairs = [];
 
-        document.querySelectorAll('.repair-item').forEach(item => {
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            const priceInput = item.querySelector('input[type="number"]');
+        // Process repair service cards
+        document.querySelectorAll('.repair-service-card').forEach(card => {
+            const checkbox = card.querySelector('input[type="checkbox"]');
+            const priceInput = card.querySelector('input[type="number"]');
 
             if (checkbox && checkbox.checked && priceInput && priceInput.value) {
-                let description = checkbox.nextElementSibling.textContent;
+                let description = '';
 
-                // Handle custom repairs
-                if (checkbox.value.startsWith('custom_')) {
-                    const descInput = item.querySelector('input[type="text"]');
-                    description = descInput ? descInput.value : 'Custom Repair';
+                // Handle temporary/custom repairs
+                if (checkbox.value.startsWith('temp_')) {
+                    const descInput = card.querySelector('.custom-repair-input');
+                    description = descInput ? descInput.value.trim() : 'Custom Repair';
+                    if (!description) {
+                        alert('Please enter a description for the custom repair.');
+                        descInput.focus();
+                        return;
+                    }
+                } else {
+                    // Handle standard services
+                    const serviceNameElement = card.querySelector('.service-name');
+                    description = serviceNameElement ? serviceNameElement.textContent : 'Unknown Service';
+                }
+
+                const price = parseFloat(priceInput.value) || 0;
+                if (price <= 0) {
+                    alert(`Please enter a valid price for: ${description}`);
+                    priceInput.focus();
+                    return;
                 }
 
                 repairs.push({
                     id: checkbox.value,
                     description: description,
-                    price: parseFloat(priceInput.value) || 0
+                    price: price
                 });
             }
         });
 
+        if (repairs.length === 0) {
+            alert('Please select at least one repair service.');
+            return;
+        }
+
         const totalAmount = repairs.reduce((sum, repair) => sum + repair.price, 0);
+        const notes = document.getElementById('jobNotes').value.trim();
 
         // Create job offer using database
         const jobOffer = db.addJobOffer({
@@ -724,15 +787,18 @@ function saveJobOffer(event, bicycleId) {
             bicycleId: bicycleId,
             repairs: repairs,
             totalAmount: totalAmount,
-            notes: document.getElementById('jobNotes').value
+            notes: notes
         });
 
-        alert('Job offer created successfully!');
+        // Show success message with ticket ID
+        showNotification(`Job offer created successfully! Ticket ID: ${jobOffer.ticketId}`, 'success');
+        
+        // Navigate to history tab
         loadHistory();
         showTab('history');
     } catch (error) {
         console.error('Error saving job offer:', error);
-        alert('Error saving job offer: ' + error.message);
+        showNotification('Error saving job offer: ' + error.message, 'error');
     }
 }
 
@@ -1387,19 +1453,150 @@ console.log('Workshop Management System loaded successfully');
 
 // Repair Services Management Functions - NEW FUNCTIONALITY
 
-// Generate repair services list for job offers
-function generateRepairServicesList() {
+// Generate improved repair services list for job offers
+function generateImprovedRepairServicesList() {
     const allServices = repairServices.getAllServices();
 
     return allServices.map(service => `
-        <div class="repair-item" id="repair_item_${service.id}">
-            <input type="checkbox" id="${service.id}" name="repairs" value="${service.id}">
-            <label for="${service.id}">${service.name}</label>
-            <input type="number" placeholder="Price" step="0.01" min="0" id="price_${service.id}" value="${service.defaultPrice}">
-            <button type="button" onclick="removeRepairFromJobOffer('${service.id}')" class="remove-service-btn" title="Remove from this job offer">×</button>
-            ${service.isCustom ? `<button type="button" onclick="removeServiceFromList('${service.id}')" class="remove-service-btn delete-permanent" title="Delete permanently from system">🗑️</button>` : ''}
+        <div class="repair-service-card" id="repair_item_${service.id}">
+            <div class="service-checkbox">
+                <input type="checkbox" id="${service.id}" name="repairs" value="${service.id}" onchange="calculateTotal()">
+                <label for="${service.id}" class="service-label">
+                    <div class="service-name">${service.name}</div>
+                    <div class="service-type">${service.isCustom ? '🔧 Custom' : '⚙️ Standard'}</div>
+                </label>
+            </div>
+            <div class="service-price">
+                <input type="number" 
+                       placeholder="Price" 
+                       step="0.01" 
+                       min="0" 
+                       id="price_${service.id}" 
+                       value="${service.defaultPrice}"
+                       oninput="calculateTotal()"
+                       class="price-input">
+                <span class="currency">₪</span>
+            </div>
+            <div class="service-actions">
+                ${service.isCustom ? `
+                    <button type="button" onclick="removeServiceFromList('${service.id}')" class="delete-service-btn" title="Delete permanently from system">
+                        🗑️
+                    </button>
+                ` : ''}
+            </div>
         </div>
     `).join('');
+}
+
+// Generate repair services list for job offers (legacy function for compatibility)
+function generateRepairServicesList() {
+    return generateImprovedRepairServicesList();
+}
+
+// Helper functions for improved job offer form
+function selectAllRepairs() {
+    console.log('Selecting all repairs');
+    try {
+        document.querySelectorAll('.repair-service-card input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        calculateTotal();
+    } catch (error) {
+        console.error('Error selecting all repairs:', error);
+    }
+}
+
+function clearAllRepairs() {
+    console.log('Clearing all repairs');
+    try {
+        document.querySelectorAll('.repair-service-card input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        calculateTotal();
+    } catch (error) {
+        console.error('Error clearing all repairs:', error);
+    }
+}
+
+// Improved calculate total function for new form structure
+function calculateTotal() {
+    try {
+        let total = 0;
+
+        // Calculate from repair service cards
+        document.querySelectorAll('.repair-service-card').forEach(card => {
+            const checkbox = card.querySelector('input[type="checkbox"]');
+            const priceInput = card.querySelector('input[type="number"]');
+
+            if (checkbox && checkbox.checked && priceInput && priceInput.value) {
+                total += parseFloat(priceInput.value) || 0;
+            }
+        });
+
+        // Calculate from temporary repairs
+        document.querySelectorAll('.temporary-repair').forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const priceInput = item.querySelector('input[type="number"]');
+
+            if (checkbox && checkbox.checked && priceInput && priceInput.value) {
+                total += parseFloat(priceInput.value) || 0;
+            }
+        });
+
+        const totalElement = document.getElementById('totalAmount');
+        if (totalElement) {
+            totalElement.textContent = total.toFixed(2);
+        }
+    } catch (error) {
+        console.error('Error calculating total:', error);
+    }
+}
+
+// Improved add temporary repair function
+function addTemporaryRepair() {
+    console.log('Adding temporary repair');
+    try {
+        const repairItems = document.getElementById('repairItems');
+        const tempId = 'temp_' + Date.now();
+
+        const div = document.createElement('div');
+        div.className = 'repair-service-card temporary-repair';
+        div.id = `repair_item_${tempId}`;
+        div.innerHTML = `
+            <div class="service-checkbox">
+                <input type="checkbox" id="${tempId}" name="repairs" value="${tempId}" onchange="calculateTotal()">
+                <label for="${tempId}" class="service-label">
+                    <input type="text" placeholder="Enter custom repair description..." id="desc_${tempId}" required class="custom-repair-input">
+                    <div class="service-type">🔧 Custom</div>
+                </label>
+            </div>
+            <div class="service-price">
+                <input type="number" 
+                       placeholder="Price" 
+                       step="0.01" 
+                       min="0" 
+                       id="price_${tempId}" 
+                       oninput="calculateTotal()"
+                       class="price-input">
+                <span class="currency">₪</span>
+            </div>
+            <div class="service-actions">
+                <button type="button" onclick="this.parentElement.parentElement.remove(); calculateTotal();" class="delete-service-btn" title="Remove this custom repair">
+                    🗑️
+                </button>
+            </div>
+        `;
+
+        repairItems.appendChild(div);
+        
+        // Focus on the description input
+        const descInput = div.querySelector('.custom-repair-input');
+        if (descInput) {
+            descInput.focus();
+        }
+    } catch (error) {
+        console.error('Error adding temporary repair:', error);
+    }
 }
 
 // Remove repair from current job offer (not permanently from system)
